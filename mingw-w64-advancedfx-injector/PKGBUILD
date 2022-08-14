@@ -10,55 +10,38 @@ arch=('i686' 'x86_64')
 mingw_arch=('mingw32' 'mingw64')
 url='https://github.com/advancedfx/advancedfx-injector'
 license=('MIT')
-makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
-             "${MINGW_PACKAGE_PREFIX}-ninja"
-             "${MINGW_PACKAGE_PREFIX}-cc"
+makedepends=("${MINGW_PACKAGE_PREFIX}-rust"
              "${MINGW_PACKAGE_PREFIX}-nasm")
-source=("${_realname}.tar.gz"
-        "LICENSE"
-)
-sha256sums=('SKIP'
-            'SKIP'
-)
-options=('staticlibs' )
-LDFLAGS="${LDFLAGS} -static -s -Os"
+source=("${_realname}-${pkgver}.tar.gz")
+sha256sums=('SKIP')
 
 prepare() {
-  cd "${srcdir}"/${_realname}
+  cd "${srcdir}/${_realname}-${pkgver}"
+
+  cargo fetch --locked
 }
 
 build() {
-  cd "${srcdir}/${_realname}"
-  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+  cd "${srcdir}/${_realname}-${pkgver}"
 
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("-DCMAKE_BUILD_TYPE=Release")
-  else
-    extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
-  fi
-
-  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
-    "${MINGW_PREFIX}"/bin/cmake.exe \
-      -GNinja \
-      -DCMAKE_INSTALL_PREFIX="${MINGW_PREFIX}" \
-      "${extra_config[@]}" \
-      -DBUILD_{SHARED,STATIC}_LIBS=ON \
-      ../${_realname}
-
-  "${MINGW_PREFIX}"/bin/cmake.exe --build .
+  cargo build --release --frozen
 }
 
 check() {
-  cd "${srcdir}/build-${MSYSTEM}"
+  cd "${srcdir}/${_realname}-${pkgver}"
 
-  #"${MINGW_PREFIX}"/bin/cmake.exe --build . --target test
+  cargo test --release --frozen
 }
 
 package() {
-  cd "${srcdir}/build-${MSYSTEM}"
+   cd "${srcdir}/${_realname}-${pkgver}"
 
-  DESTDIR="${pkgdir}" "${MINGW_PREFIX}"/bin/cmake.exe --install .
+  cargo install \
+    --offline \
+    --no-track \
+    --frozen \
+    --path . \
+    --root "${pkgdir}${MINGW_PREFIX}"
 
-  install -Dm644 "${srcdir}/LICENSE" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/LICENSE" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 }
