@@ -318,7 +318,7 @@ struct Cli {
     #[arg(short, long)]
     current_directory: Option<String>,
 
-    /// Number of times to greet
+    /// Milliseconds to wait before checking for CTRL+C.
     #[arg(short, long, default_value_t = 500)]
     wait_interval_ms: u32,
 }
