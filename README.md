@@ -7,10 +7,11 @@ The reason for it being an own package / installer is to avoid frequent AV false
 # How to build
 
 ```
-mkdir build
-cd build
-mkdir Release
-cd Release
-cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 16 2019" -T "v142" -A "Win32" ../..
-cmake --build . -v -- -r
+rustup target add i686-pc-windows-msvc
+rustup target add x86_64-pc-windows-msvc
+```
+
+```
+cargo build --target i686-pc-windows-msvc --release
+cargo build --target x86_64-pc-windows-msvc --release
 ```

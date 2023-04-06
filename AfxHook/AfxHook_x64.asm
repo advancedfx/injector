@@ -60,6 +60,11 @@ labelBoot:
 	ret
 labelCont1:
 	mov [rbp -0x8], rax
+
+	; skip if no DLL directory is to be set:
+	lea rax, [argDllDirectory]
+	test BYTE [rax], 0xff
+	jz lanelCont6Skipped	
 	
 	; get pGetProcessHeap:
 	lea rdx, [datGetProcessHeap]
@@ -125,7 +130,8 @@ labelCont5:
 	ret
 labelCont6:
 	mov [rbp -0x30], rax
-	
+
+ lanelCont6Skipped:
 	; get pLoadLibraryExW:
 	lea rdx, [datLoadLibraryExW]
 	mov rcx, [rbp -0x8]
@@ -138,6 +144,11 @@ labelCont6:
 	ret
 labelCont7:
 	mov [rbp -0x38], rax
+
+	; skip if no DLL directory is to be set:
+	lea rax, [argDllDirectory]
+	test BYTE [rax], 0xff
+	jz labelCont12
 	
 	; get process heap:
 	call [rbp -0x10]
@@ -212,13 +223,27 @@ labelCont12:
 	call [rbp -0x38]
 	cmp rax, 0
 	jnz labelCont13
+
+	; skip if no DLL directory is to be set:
+	lea rax, [argDllDirectory]
+	test BYTE [rax], 0xff
+	jz labelCont12Skipped
+
 	call labelSubRestoreCwd
 	call labelSubFree
+
+labelCont12Skipped:	
 	mov eax, 13 ; error
 	mov rsp, rbp
 	pop rbp
 	ret
+
 labelCont13:
+
+	; skip if no DLL directory is to be set:
+	lea rax, [argDllDirectory]
+	test BYTE [rax], 0xff
+	jz labelCont15
 	
 	; resore old Current Working Directory:
 	call labelSubRestoreCwd
