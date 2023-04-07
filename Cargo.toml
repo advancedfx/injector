@@ -1,19 +1,18 @@
 [package]
 name = "injector"
 version = "2.0.0"
-authors = ["Dominik Tugend <dominik@matrixstorm.com>"]
+authors = ["advancedfx.org <contact@advancedfx.org>"]
 license = "MIT"
 edition = "2021"
 homepage = "https://github.com/advancedfx/injector"
 repository = "https://github.com/advancedfx/injector"
 
 [dependencies]
-libc = { version = "0", features = [] }
-bitflags = "1"
 clap = { version = "4.2.1", features = ["derive"] }
 serde_json = "1.0.95"
 serde = { version = "1.0.159", features = ["derive"] }
 ctrlc = "3.2.5"
+winapi = { version = "0.3.9", features = ["std", "processthreadsapi", "libloaderapi", "errhandlingapi", "handleapi", "memoryapi", "winnt", "synchapi", "winbase"] }
 
 [build-dependencies]
 sha2 = "0"

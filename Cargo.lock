@@ -376,15 +376,14 @@ dependencies = [
 name = "injector"
 version = "2.0.0"
 dependencies = [
- "bitflags",
  "clap",
  "ctrlc",
  "http_req",
- "libc",
  "serde",
  "serde_json",
  "sha2",
  "unwrap",
+ "winapi",
  "zip",
 ]
 
