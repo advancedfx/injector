@@ -91,8 +91,8 @@ impl Injector {
         let os_string_base_directory = std::ffi::OsStr::new(base_directory);
         let wsz_dll_file_path: Vec<u16> = os_string_dll_file_path.encode_wide().chain(Some(0)).collect();
         let wsz_base_directory: Vec<u16> = os_string_base_directory.encode_wide().chain(Some(0)).collect();
-        let cb_dll_file_path_size =  wsz_dll_file_path.len();
-        let cb_base_directory_size = wsz_base_directory.len();
+        let cb_dll_file_path_size =  wsz_dll_file_path.len() * std::mem::size_of::<u16>();
+        let cb_base_directory_size = wsz_base_directory.len() * std::mem::size_of::<u16>();
 
         let h_kernel32_dll = unsafe{ GetModuleHandleW(wsz_kernel32_dll.as_ptr()) };
         if std::ptr::null() == h_kernel32_dll {
@@ -249,7 +249,7 @@ struct Cli {
 }
 
 
-fn main() {
+fn main() -> std::process::ExitCode {
     let cli = Cli::parse();
 
     let process_id = cli.process_id;
@@ -285,5 +285,11 @@ fn main() {
 
     let json_result = serde_json::to_string(&result).unwrap();
 
-    println!("{}", json_result);
+    match result {
+        InjectResult::Ok() => std::process::ExitCode::SUCCESS,
+        _ => {
+            eprintln!("{}", json_result);
+            std::process::ExitCode::FAILURE
+        }
+    }
 }
